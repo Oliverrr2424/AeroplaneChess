@@ -123,6 +123,9 @@ function addPlaneEvent(state) {
         setTimeout(nextUser(), 1000);
     } else if (state == 'computer') {  //电脑执行
         computer.performing();
+    } else if (state == 'normal' && planeOption.isOnlineMode) {
+        // 在线模式下，玩家操作后通知服务器
+        // 这里应该添加网络通信代码
     }
 }
 
@@ -164,6 +167,11 @@ function movePlane(obj) {
             } else {    //6可连续投骰
                 addDiceEvent();
                 nextStep = true;
+            }
+            
+            // 在线模式下通知服务器
+            if (planeOption.isOnlineMode) {
+                // 发送移动信息到服务器
             }
         });
     } else {
@@ -228,6 +236,11 @@ function movePlane(obj) {
                     } else {    //6可连续投骰
                         addDiceEvent();
                         nextStep = true;
+                    }
+                    
+                    // 在线模式下通知服务器
+                    if (planeOption.isOnlineMode) {
+                        // 发送移动信息到服务器
                     }
                 }
                 return;
@@ -374,6 +387,11 @@ function nextUser() {
             $j("#dice").click();
         }, 1500);
     }
+    
+    // 在线模式下通知服务器
+    if (planeOption.isOnlineMode) {
+        // 发送当前用户信息到服务器
+    }
 }
 
 /**
@@ -384,6 +402,11 @@ function addDiceEvent() {
         $j("#dice").unbind('click').removeClass('pointer');
         DICE.shuffle(1, onComplete);
         planeAudio.playDiceMusic();
+        
+        // 在线模式下通知服务器
+        if (planeOption.isOnlineMode) {
+            // 发送骰子信息到服务器
+        }
     }).addClass('pointer');
 }
 

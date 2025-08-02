@@ -21,6 +21,9 @@ var PlaneOption = function () {
     this.currentUser = 'red';  //当前用户
     this.backgroundMusic = true;    //背景音乐开关
     this.gameMusic = true;  //游戏音效开关
+    this.isOnlineMode = false; // 是否为在线模式
+    this.playerColor = 'red'; // 在线模式下的玩家颜色
+    
     /**
      * 设置难度
      */
@@ -73,10 +76,28 @@ var PlaneOption = function () {
     }
 
     this.setUserList = function () {
-        setUser('#redUser li', this.userList[0]);
-        setUser('#blueUser li', this.userList[1]);
-        setUser('#yellowUser li', this.userList[2]);
-        setUser('#greenUser li', this.userList[3]);
+        // 在在线模式下，根据服务器分配的颜色设置玩家
+        if (this.isOnlineMode) {
+            // 重置所有用户为电脑或关闭状态
+            for (var i = 0; i < this.userList.length; i++) {
+                if (this.userList[i].color !== this.playerColor) {
+                    // 保留两个电脑玩家，将其他设置为关闭
+                    if (this.userList[i].color === 'blue' || this.userList[i].color === 'yellow') {
+                        this.userList[i].state = 'computer';
+                    } else {
+                        this.userList[i].state = 'close';
+                    }
+                } else {
+                    this.userList[i].state = 'normal';
+                }
+            }
+        } else {
+            // 本地模式保持原有逻辑
+            setUser('#redUser li', this.userList[0]);
+            setUser('#blueUser li', this.userList[1]);
+            setUser('#yellowUser li', this.userList[2]);
+            setUser('#greenUser li', this.userList[3]);
+        }
     };
 
     /**
@@ -88,6 +109,11 @@ var PlaneOption = function () {
         createPlane(planeOption.userList);
         $j("#sdn" + planeOption.currentUser).text('请投骰');
         $j('.option').hide();
+        
+        // 初始化网络模块
+        if (!network.isConnected) {
+            network.init();
+        }
     };
 
     this.tabStyle = function (obj) {
@@ -97,6 +123,14 @@ var PlaneOption = function () {
                 $j(this).siblings().removeClass('bth');
             });
         });
+    };
+    
+    /**
+     * 设置在线模式
+     */
+    this.setOnlineMode = function(playerColor) {
+        this.isOnlineMode = true;
+        this.playerColor = playerColor;
     };
 };
 var planeOption = new PlaneOption();
